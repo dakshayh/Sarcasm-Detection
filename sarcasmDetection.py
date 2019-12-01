@@ -1,7 +1,10 @@
 
 import pickle
-from keras.layers import Embedding, Dense, LSTM, Conv1D, MaxPooling1D, Dropout
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential
+from keras.layers import Dense, Flatten, LSTM, Conv1D, MaxPooling1D, Dropout, Activation, Bidirectional, TimeDistributed
+from keras.layers.embeddings import Embedding
 from keras.callbacks import ModelCheckpoint
 
 pickleFile = open('pickleDetect','rb')
@@ -15,13 +18,12 @@ vocab_size = pickle.load(pickleFile)
 print(max_length)
 
 ## create model
-model = Sequential()
-model.add(Embedding(vocab_size, 100, input_length=max_length, weights=[embedding_matrix], trainable=False))
-model.add(Dropout(0.2))
-model.add(Conv1D(64, 5, activation='relu'))
-model.add(MaxPooling1D(pool_size=4))
-model.add(LSTM(100))
-model.add(Dense(1, activation='sigmoid'))
+model_glove = Sequential()
+model_glove.add(Embedding(vocab_size, 100, input_length=max_length, weights=[embedding_matrix], trainable=False))
+model_glove.add(Bidirectional(LSTM(100)))
+model_glove.add(Dense(30,activation = "relu"))
+model_glove.add(Dense(15,activation = "relu"))
+model_glove.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # checkpoint
